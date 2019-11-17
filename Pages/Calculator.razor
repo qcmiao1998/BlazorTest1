@@ -1,0 +1,96 @@
+﻿@page "/calculator"
+@using BlazorTest1.Models
+
+<h3>Calculator</h3>
+
+<div class="bs-docs-section">
+    <div class="row">
+        <div class="col-lg-6">
+            <fieldset class="form-group">
+                <div class="form-group">
+                    <label>Type</label>
+                    <select class="custom-select" id="typeSelect" @bind="_cal.MethodSelected">
+                        <option value=@Cal.Method.NumericalDifferential>Numerical Differential</option>
+                        <option value=@Cal.Method.NumericalIntegration>Numerical Integration</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Expression</label>
+                    <input type="text" class="form-control" id="expressionInput" @bind="_cal.Expression" placeholder="e.g. sin(x)"/>
+                </div>
+                <div class="form-group">
+                    <label>Variable</label>
+                    <input type="text" class="form-control" id="variableInput" @bind="_cal.Variable" placeholder="e.g. x"/>
+                </div>
+
+                @if (_cal.MethodSelected == Cal.Method.NumericalIntegration)
+                {
+                    <div class="form-group">
+                        <label id="firstPointLabel">Start Point</label>
+                        <input type="number" class="form-control" id="pointInput" @bind="_cal.FirstPoint"/>
+                    </div>
+                    <div class="form-group" id="secondPointZone">
+                        <label id="secondPointLabel">End Point</label>
+                        <input type="number" class="form-control" id="secondPointInput" @bind="_cal.SecondPoint"/>
+                    </div>
+                }
+                else if (_cal.MethodSelected == Cal.Method.NumericalDifferential)
+                {
+                    <div class="form-group">
+                        <label id="firstPointLabel">Point</label>
+                        <input type="number" class="form-control" id="pointInput" @bind="_cal.FirstPoint" />
+                    </div>
+                    <div class="form-group">
+                        <label id="orderLabel">Order</label>
+                        <input type="number" class="form-control" id="orderInput" @bind="_cal.Order" />
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label>Result</label>
+                    <input class="form-control" type="text" id="resultOutput" readonly="" value="@_cal.Result" />
+                </div>
+                @if (_cal.MethodSelected == Cal.Method.NumericalIntegration)
+                {
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="advancedOptions" @bind="Advanced" />
+                                   <label class="custom-control-label" for="advancedOptions">Advanced options</label>
+                                   </div>
+                                   </div>
+                    @if (Advanced)
+                    {
+                        <div class="form-group" id="advancedInputZone"><label id="advancedInputLabel" type="text">Error Limitation</label><input type="number" class="form-control" id="errorLimitation" @bind="_cal.ErrorLimitation" /></div>
+                    }
+                }
+                @if (!String.IsNullOrEmpty(_cal.InvalidMessageText))
+                {
+                    <div class="form-group" id="invalidMessageZone"><p style="color:#EB6864;font-size:15px" id="invalidMessageText">@_cal.InvalidMessageText</p></div>
+                }
+                <button type="submit" class="btn btn-primary" id="calcButton" @onclick="_cal.RunCal">Calculate</button>
+            </fieldset>
+        </div>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Help</h4>
+                    <p class="card-text">
+                        This toolbox use finite-difference approximation to calculate the differential differences of a point, and use Newton Cotes Trapezium Rule to calculate the integration.
+                    </p>
+                    <p class="card-text">
+                        Defaultly, the error limitation of integration is set as 1E-6. You can modify the setting through the advanced options.
+                    </p>
+                    <p class="card-text">
+                        Please follow the placeholder to fill the form on the left. This toolbox applies <a href="https://mathparser.org" target="_blank">mXparser</a> to evaluate expressions and applies <a href="https://numerics.mathdotnet.com/" target="_blank">Math.NET Numerics</a> to finish the calculation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    bool Advanced { get; set; } = false;
+    Cal _cal = new Cal();
+}
